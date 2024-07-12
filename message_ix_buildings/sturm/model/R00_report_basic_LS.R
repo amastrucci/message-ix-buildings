@@ -16,7 +16,7 @@ fun_report_basic <- function(report, report_var, geo_data, geo_level, geo_level_
       en_stock_rep <- report$en_stock} else {
         en_stock_rep <- report$en_stock %>%
           left_join(geo_data) %>%
-          group_by_at(paste(c(geo_level_report, "urt","arch","mat","eneff","fuel_heat","fuel_cool", 
+          group_by_at(paste(c(geo_level_report, "urt","hh_group","arch","mat","eneff","fuel_heat","fuel_cool",  #LS: added hh_group 
                               "scenario", # "ssp", # drop SSP
                               "year"))) %>%
           summarise(stock_M =sum(stock_M),
@@ -41,7 +41,7 @@ fun_report_basic <- function(report, report_var, geo_data, geo_level, geo_level_
       mat_stock_rep <- report$mat_stock} else {
       mat_stock_rep <- report$mat_stock %>%
           left_join(geo_data) %>%
-          group_by_at(paste(c(geo_level_report, "urt","arch","mat","eneff","material", 
+          group_by_at(paste(c(geo_level_report, "urt","hh_group","arch","mat","eneff","material",   #LS: added hh_group 
                               "scenario", # "ssp", # drop SSP
                               "year"))) %>%
           summarise(
@@ -65,7 +65,7 @@ fun_report_basic <- function(report, report_var, geo_data, geo_level, geo_level_
       bld_eneff_age_rep <- report$bld_eneff_age} else {
         bld_eneff_age_rep <- report$bld_eneff_age %>%
           left_join(geo_data) %>%
-          group_by_at(paste(c(geo_level_report, "year", "yr_con","urt","arch","mat","eneff" 
+          group_by_at(paste(c(geo_level_report, "year", "yr_con","urt","hh_group","arch","mat","eneff"  #LS: added hh_group 
                               #,"scenario", # "ssp", # drop SSP
                               ))) %>%
           summarise(n_units =sum(n_units_eneff))%>%
