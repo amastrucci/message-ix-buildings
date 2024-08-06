@@ -70,7 +70,7 @@ fun_stock_init_fut <- function(sector, run,
       filter(year %in% yrs[-1]) %>% 
       left_join(hh_size) %>% 
       left_join(shr_hh_group) %>% # LS:
-      mutate(bld_units = round(1e6*pop/n_inc_cl/hh_size,rnd)) %>% # convert from million units to units
+      mutate(bld_units = round(1e6*pop/n_inc_cl/hh_size*shr_hh_group,rnd)) %>% # convert from million units to units # LS:
       select(-c(pop,hh_size,shr_hh_group)) # %>% # LS:
       #select(-c(pop,hh_size)) # %>% # LS:
     #filter(year %in% yrs) # years already filtered

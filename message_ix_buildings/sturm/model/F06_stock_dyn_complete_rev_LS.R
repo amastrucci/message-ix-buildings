@@ -169,7 +169,7 @@ if(mod_arch == "new"){
                                     c("yr_con","eneff","fuel_heat","fuel_cool" #,"arch" 
                                       ,"bld_age" 
                                       ,"inc_cl", "hh_group" #LS: aggregate over hh groups # LS: check if "inc_cl" and "hh_group" should be here?
-                                      # ,"mod_decision"
+                                      ,"mod_decision" # LS: correction 2024.08.06
                                       ,"n_units_fuel_p","n_dem"))) %>% # Select all variables, except the ones indicated, for grouping
                 summarise(n_dem=sum(n_dem))%>%
                 ungroup()) %>%
@@ -187,7 +187,7 @@ if(mod_arch == "new"){
                                                 "bld_age", # added 22/11/2021
                                                 "inc_cl", "hh_group", #LS: aggregate over hh groups
                                                 "eneff","fuel_heat","fuel_cool"  
-                                                #,"mod_decision"
+                                                ,"mod_decision" # LS: correction 2024.08.06
                                                 , "n_units_fuel_p","n_dem"))) %>% # Select all variables, except "eneff" and "n_dem" for grouping)
     mutate(n_units_fuel_upd_tot = sum(n_units_fuel_p - n_dem))%>% # surviving units
     ungroup() %>%
@@ -249,7 +249,8 @@ if(mod_arch == "new"){
     #mutate(n_ren = 0) %>% 
     #relocate(n_new, .before=n_dem) %>%
     filter(n_new>0) %>%
-    mutate(n_units_fuel = round(shr_hh_group * n_new,rnd), .after = last_col()) %>% # LS:
+    #mutate(n_units_fuel = round(shr_hh_group * n_new,rnd), .after = last_col()) %>% # LS: ## n_new is already by hh_group: corrected (see next row)
+    relocate(n_units_fuel = n_new, .after = last_col()) %>%    # LS:
     #relocate(n_units_fuel = n_new, .after = last_col()) %>%
     select(-c(shr_distr_heat,shr_hh_group)) #, LS:
 #    select(-c(shr_distr_heat)) #,
@@ -497,7 +498,7 @@ if ("sub" %in% unique(bld_cases_eneff$mat)){
   
   # Aggregate at fuel level for keeping track of the stock
   bld_det_i <- bld_det_age_i %>%
-    group_by_at(setdiff(names(bld_det_age_i), c("yr_con","n_units_fuel","n_dem","n_empty"))) %>% # Select all variables, except the ones indicated, for grouping
+    group_by_at(setdiff(names(bld_det_age_i), c("mod_decision","yr_con","n_units_fuel","n_dem","n_empty"))) %>% # Select all variables, except the ones indicated, for grouping # LS: added "mod_decision"
     summarise(n_units_fuel = sum(n_units_fuel)
               # , n_dem=sum(n_dem)
               )%>%
