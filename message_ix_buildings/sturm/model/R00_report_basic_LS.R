@@ -44,7 +44,9 @@ fun_report_basic <- function(report, report_var, geo_data, geo_level, geo_level_
           group_by_at(paste(c(geo_level_report, "urt","hh_group","arch","mat","eneff","material",   #LS: added hh_group 
                               "scenario", # "ssp", # drop SSP
                               "year"))) %>%
-          summarise(
+          summarise(stock_M =sum(stock_M),
+                    n_new_M = sum(n_new_M),
+                    n_dem_M = sum(n_dem_M),
                     floor_tot_Mm2 = sum(floor_tot_Mm2), 
                     floor_new_Mm2 = sum(floor_new_Mm2), 
                     floor_dem_Mm2 = sum(floor_dem_Mm2), 

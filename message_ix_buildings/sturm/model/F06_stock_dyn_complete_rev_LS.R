@@ -691,7 +691,10 @@ if("material" %in% report_var){
                   paste(c("urt", "clim","hh_group", "inc_cl", "arch", "mat", "eneff", "material", "scenario", #"ssp", # LS: hh_group added
                           "year")))) %>% #Drop yr_con dimension
     
-    summarise(floor_tot_Mm2 = sum(floor_tot_Mm2),
+    summarise(stock_M =  sum(n_units)/ 1e6,
+              n_new_M =  sum(n_new)/ 1e6,
+              n_dem_M =  sum(n_dem)/ 1e6,
+              floor_tot_Mm2 = sum(floor_tot_Mm2),
               floor_new_Mm2 = sum(floor_new_Mm2), 
               floor_dem_Mm2 = sum(floor_dem_Mm2),
               #mat_int = weighted.mean(mat_int, floor_tot_Mm2),
