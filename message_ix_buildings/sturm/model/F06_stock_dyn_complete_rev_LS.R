@@ -647,6 +647,7 @@ bld_eneff_i <- bld_det_age_i %>%
   group_by_at(setdiff(names(bld_det_age_i), c(#"arch", 
     "bld_age",
     #"yr_con", # Keep year construction to associate time-dependent material intensities
+    "mod_decision", #LS: 2
     "fuel_heat","fuel_cool", "n_units_fuel"))) %>%
   summarise(n_units = sum(n_units_fuel)) %>%
   ungroup()
