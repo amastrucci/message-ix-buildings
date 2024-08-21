@@ -62,23 +62,24 @@ fun_stock_init_fut <- function(sector, run,
   # number of income classes
   n_inc_cl <- length(unique(ct_inc_cl$inc_cl))
   
-  # Total number of building units: (Residential: number of households (units) - Commercial: total floorspace (m2))
-  if (sector == "resid") {
-    bld_units <- geo_data %>%
-      select_at(geo_levels) %>%
-      left_join(pop) %>%
-      filter(year %in% yrs[-1]) %>% 
-      left_join(hh_size) %>% 
-      left_join(shr_hh_group) %>% # LS:
-      mutate(bld_units = round(1e6*pop/n_inc_cl/hh_size*shr_hh_group,rnd)) %>% # convert from million units to units # LS:
-      select(-c(pop,hh_size,shr_hh_group)) # %>% # LS:
-      #select(-c(pop,hh_size)) # %>% # LS:
-    #filter(year %in% yrs) # years already filtered
-    
-    
-    
-    try(if(nrow(bld_units) != nrow(distinct(bld_units))) stop("Error in aggregated households calculations! duplicated records in hh"))
-  }
+  # # LS: Integrated bld_units within stock_aggr_hh to include mapping between household groups and housing types 
+  # # Total number of building units: (Residential: number of households (units) - Commercial: total floorspace (m2))
+  # if (sector == "resid") {
+  #   bld_units <- geo_data %>%
+  #     select_at(geo_levels) %>%
+  #     left_join(pop) %>%
+  #     filter(year %in% yrs[-1]) %>% 
+  #     left_join(hh_size) %>% 
+  #     left_join(shr_hh_group) %>% # LS:
+  #     mutate(bld_units = round(1e6*pop/n_inc_cl/hh_size*shr_hh_group,rnd)) %>% # convert from million units to units # LS:
+  #     select(-c(pop,hh_size,shr_hh_group)) # %>% # LS:
+  #     #select(-c(pop,hh_size)) # %>% # LS:
+  #   #filter(year %in% yrs) # years already filtered
+  #   
+  #   
+  #   
+  #   try(if(nrow(bld_units) != nrow(distinct(bld_units))) stop("Error in aggregated households calculations! duplicated records in hh"))
+  # }
 
   if (sector == "comm") {
     bld_units <- geo_data %>%
@@ -132,19 +133,36 @@ fun_stock_init_fut <- function(sector, run,
       ungroup()
   
   } else if (mod_arch == "stock") {
+
     
-    # stock aggregated: Number of units (Million) - "arch" level
+    # stock aggregated: Number of units (Million) - "arch" level LS: Changed code to include mapping between household groups and housing types
     stock_aggr_hh <- bld_cases_eneff %>%  # LS:
       select(-c(eneff,bld_age)) %>% # aggregate at "arch" level
       distinct() %>%
-      left_join(bld_units) %>% # years filtered here
+      left_join(pop %>% filter(year %in% yrs[-1])) %>% #LS:2 
+      left_join(hh_size) %>% 
+      left_join(shr_hh_group) %>% # LS:
+      #left_join(bld_units) %>% # years filtered here
       left_join(shr_mat) %>% 
       left_join(shr_arch) %>% # long format
       #mutate(n_units_aggr = round(bld_units * shr_mat,rnd)) %>% # to mat level
-      mutate(n_units_aggr = bld_units * shr_mat * shr_arch) %>% # to arch level
+      mutate(n_units_aggr = round(1e6*pop/n_inc_cl/hh_size*shr_hh_group,rnd) * shr_mat * shr_arch) %>% # to arch level
       #select(-c(bld_units, shr_mat)) #%>%
-    #arrange_at(c(geo_level, "urt", "inc_cl", "region_gea", "clim", "mat", "year"))
-    select(-c(bld_units, shr_mat, shr_arch))
+      #arrange_at(c(geo_level, "urt", "inc_cl", "region_gea", "clim", "mat", "year"))
+      select(-c(pop,hh_size,shr_hh_group, shr_mat, shr_arch))
+    
+    # # stock aggregated: Number of units (Million) - "arch" level - OLD LS: CODE
+    # stock_aggr_hh <- bld_cases_eneff %>%  # LS:
+    #   select(-c(eneff,bld_age)) %>% # aggregate at "arch" level
+    #   distinct() %>%
+    #   left_join(bld_units) %>% # years filtered here
+    #   left_join(shr_mat) %>% 
+    #   left_join(shr_arch) %>% # long format
+    #   #mutate(n_units_aggr = round(bld_units * shr_mat,rnd)) %>% # to mat level
+    #   mutate(n_units_aggr = bld_units * shr_mat * shr_arch) %>% # to arch level
+    #   #select(-c(bld_units, shr_mat)) #%>%
+    # #arrange_at(c(geo_level, "urt", "inc_cl", "region_gea", "clim", "mat", "year"))
+    # select(-c(bld_units, shr_mat, shr_arch))
     
     try(if(nrow(stock_aggr_hh) != nrow(distinct(stock_aggr_hh %>% select(-c(n_units_aggr))))) stop("Error in aggregated stock dataset! multiple records for same combinations in stock_aggr_hh")) # LS:
     # try(if(nrow(stock_aggr) != nrow(distinct(stock_aggr %>% select(-c(n_units_aggr))))) stop("Error in aggregated stock dataset! multiple records for same combinations in stock_aggr"))
